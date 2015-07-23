@@ -1,6 +1,7 @@
 !=========================================================================================
 module myType_type
 !=========================================================================================
+  use, intrinsic :: iso_fortran_env
   use json_module
   implicit none
 
@@ -16,10 +17,15 @@ module myType_type
   public :: json_add
   public :: json_get
 
+  ! parameters:
+  integer, parameter :: IK = int32
+  integer, parameter :: LK = logical_kinds(min(3,size(logical_kinds)))
+  integer, parameter :: RK = real64
+
   ! derived type definitions:
   type :: myType
-    integer :: iVal = 0
-    real    :: rVal = 0
+    integer(IK) :: iVal = 0
+    real(RK)    :: rVal = 0
   end type myType
 
   ! interfaces:
@@ -51,8 +57,8 @@ contains
 !   Returns a new type(myType).
 !
   pure function constructor( iVal, rVal ) result( val )
-    integer, intent(in) :: iVal
-    real   , intent(in) :: rVal
+    integer(IK), intent(in) :: iVal
+    real(RK)   , intent(in) :: rVal
     type(myType) :: val
 
     val%iVal = iVal
@@ -69,7 +75,7 @@ contains
   elemental function equality_myType_myType( LHS, RHS ) result( ans )
     type(myType), intent(in) :: LHS
     type(myType), intent(in) :: RHS
-    logical :: ans
+    logical(LK) :: ans
 
     ans = (LHS%iVal == RHS%iVal) .and. (LHS%rVal == RHS%rVal)
   end function equality_myType_myType
@@ -110,7 +116,7 @@ contains
     type(myType)    , intent(in) :: val(:)
     ! local variables:
     type(json_value), pointer :: array
-    integer :: i
+    integer(IK) :: i
 
     ! create json array
     call json_create_array(array, name)
@@ -136,7 +142,7 @@ contains
     type(json_value), pointer     :: me
     type(myType)    , intent(out) :: val
     ! local variables:
-    logical :: found
+    logical(LK) :: found
 
     call json_get(me, 'iVal', val%iVal, found)
     if (.not.found) return
@@ -151,13 +157,13 @@ contains
 !   Attempts to get a type(myType) variable from the json_value tree.
 !
   subroutine json_get_myType_with_path( me, path, val, found )
-    type(json_value), pointer     :: me
-    character(*)    , intent(in)  :: path
-    type(myType)    , intent(out) :: val
-    logical         , intent(out), optional :: found
+    type(json_value)        , pointer     :: me
+    character(kind=CK,len=*), intent(in)  :: path
+    type(myType)            , intent(out) :: val
+    logical(LK)             , intent(out), optional :: found
     ! local variables:
     type(json_value), pointer :: p
-    logical :: found_
+    logical(LK) :: found_
 
     nullify(p)
 
@@ -187,7 +193,7 @@ contains
     type(json_value)             , pointer     :: me
     type(myType)    , allocatable, intent(out) :: vec(:)
     ! local variables:
-    logical :: initialized
+    logical(LK) :: initialized
 
     initialized = .false.
 
@@ -199,9 +205,9 @@ contains
 
     ! callback function for type(myType)
     subroutine get_myType_from_array(element, i, count)
-      type(json_value), pointer    :: element
-      integer         , intent(in) :: i        !index
-      integer         , intent(in) :: count    !size of array
+      type(json_value), pointer, intent(in) :: element
+      integer(IK)              , intent(in) :: i        !index
+      integer(IK)              , intent(in) :: count    !size of array
 
       !size the output array:
       if (.not. initialized) then
@@ -226,9 +232,9 @@ contains
     type(json_value)                     , pointer     :: me
     character(kind=CK,len=*)             , intent(in)  :: path
     type(myType)            , allocatable, intent(out) :: vec(:)
-    logical                              , intent(out), optional :: found
+    logical(LK)                          , intent(out), optional :: found
     ! local variables:
-    logical     :: initialized
+    logical(LK)     :: initialized
 
     initialized = .false.
 
@@ -239,9 +245,9 @@ contains
 
     ! callback function for type(myType)
     subroutine get_myType_from_array(element, i, count)
-      type(json_value), pointer    :: element
-      integer         , intent(in) :: i        !index
-      integer         , intent(in) :: count    !size of array
+      type(json_value), pointer, intent(in) :: element
+      integer(IK)              , intent(in) :: i        !index
+      integer(IK)              , intent(in) :: count    !size of array
 
       !size the output array:
       if (.not. initialized) then

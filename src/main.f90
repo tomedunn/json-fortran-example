@@ -1,14 +1,14 @@
 !=========================================================================================
 program main
 !=========================================================================================
-  use json_module
   use myType_type
+  use json_module
   implicit none
   ! local variables:
   logical :: found
   integer :: i
   type(json_value), pointer :: json
-  character(:), allocatable :: str
+  character(kind=CK,len=:), allocatable :: str
   type(myType) :: var_get
   type(myType) :: var_set
   type(myType), allocatable :: vec_get(:)
